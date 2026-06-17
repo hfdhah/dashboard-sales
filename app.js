@@ -1,4 +1,4 @@
-const COLOR = {
+﻿const COLOR = {
   normal:   '#94a3b8',   // abu-abu: data normal/background
   good:     '#16a34a',   // hijau: profit positif, target tercapai
   warn:     '#d97706',   // kuning: perhatian, hampir batas
@@ -67,7 +67,7 @@ function parseDate(str) {
 }
 
 // LOAD DATA 
-d3.csv('d3.csv('sales_data.csv')').then(function(data) {
+d3.csv('sales_data.csv').then(function(data) {
   
   console.log("Sampel data mentah dari Sales_BY_Category:", data[0]);
 
