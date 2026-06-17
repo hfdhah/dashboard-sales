@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Augmented Dashboard — Sales Analytics</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+
+  <!-- API KEY MODAL -->
+<div id="api-modal-overlay" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px 32px;width:100%;max-width:420px;margin:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div style="width:36px;height:36px;border-radius:8px;background:#eff6ff;display:flex;align-items:center;justify-content:center">
+        <i class="ti ti-cpu" style="font-size:20px;color:#2563eb"></i>
+      </div>
+      <div>
+        <p style="font-size:15px;font-weight:600;margin:0;color:#1a1d23">AI Sales Dashboard</p>
+        <p style="font-size:12px;color:#6b7280;margin:0">Masukkan Groq API key untuk mengaktifkan AI</p>
+      </div>
+    </div>
+    <div style="border-top:1px solid #e2e8f0;margin-bottom:16px"></div>
+    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px">Groq API Key</label>
+    <div style="position:relative;margin-bottom:8px">
+      <input id="api-key-input" type="password" placeholder="gsk_..."
+        style="width:100%;padding:9px 40px 9px 12px;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;font-family:monospace;box-sizing:border-box;color:#1a1d23">
+      <span onclick="toggleApiKeyVisible()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;color:#6b7280" title="Tampilkan/sembunyikan">👁</span>
+    </div>
+    <p id="api-key-error" style="font-size:11px;color:#dc2626;margin:0 0 8px;display:none">API key tidak valid. Pastikan dimulai dengan gsk_</p>
+    <p style="font-size:11px;color:#6b7280;margin:0 0 16px">Key disimpan di sessionStorage — tidak dikirim ke server manapun dan hilang saat browser ditutup.</p>
+    <div style="display:flex;gap:8px">
+      <a href="https://console.groq.com/keys" target="_blank"
+        style="flex:1;padding:9px;text-align:center;border-radius:8px;border:1px solid #cbd5e1;font-size:13px;color:#374151;text-decoration:none;background:#f8f9fb">
+        Dapatkan Key ↗
+      </a>
+      <button onclick="submitApiKey()"
+        style="flex:2;padding:9px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">
+        Mulai Dashboard →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleApiKeyVisible() {
+  const input = document.getElementById('api-key-input');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function submitApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  const errEl = document.getElementById('api-key-error');
+  if (!key.startsWith('gsk_') || key.length < 20) {
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  sessionStorage.setItem('groq_api_key', key);
+  document.getElementById('api-modal-overlay').style.display = 'none';
+}
+
+// Jika key sudah ada di session, skip modal
+if (sessionStorage.getItem('groq_api_key')) {
+  document.getElementById('api-modal-overlay').style.display = 'none';
+}
+
+// Enter key support
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('api-key-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitApiKey();
+  });
+});
+</script>
+
+<nav class="tab-bar">
+  <div class="tab-bar-brand">Sales System</div>
+  <button class="btn-pill btn-ai active" id="tab-ai" onclick="switchTab('ai')">
+    <i class="ti ti-cpu btn-icon" aria-hidden="true"></i>
+    AI Dashboard D3 + LLM
+  </button>
+  <button class="btn-pill btn-tableau" id="tab-tableau" onclick="switchTab('tableau')">
+    <i class="ti ti-chart-bar btn-icon" aria-hidden="true"></i>
+    Tableau Public
+  </button>
+</nav>
+
+<div id="panel-tableau" style="display:none">
+  <div class="tableau-wrap">
+    <div class="tableau-header">
+      <div>
+        <h2>Dashboard Penjualan — Tableau Public</h2>
+      </div>
+      <a class="tableau-link"
+         href="https://public.tableau.com/app/profile/nur.hafidhah8276/viz/SalesAnalytics_17812734340910/DashboardSalesAnalytics"
+         target="_blank">Buka di Tableau Public ↗</a>
+    </div>
+    <div class="tableau-iframe-wrap">
+      <iframe id="tableau-iframe" src=""
+        data-src="https://public.tableau.com/views/SalesAnalytics_17812734340910/DashboardSalesAnalytics?:embed=yes&:showVizHome=no&:toolbar=yes"
+        allowfullscreen
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<div id="panel-ai">
+
+  <section class="zone zone-setup">
+    <div class="zone-inner">
+      <div class="zone-kicker">Sales Analytics &nbsp;·&nbsp; AI-Generated</div>
+      <h1 id="narrative-title">Memuat analisis data...</h1>
+
+      <div class="control-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #e2e8f0; margin: 16px 0 24px 0;">
+        
+        <div class="filter-bar" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+          <label for="region-filter" style="font-size: 13px; font-weight: 600; color: #334155;">Filter Region:</label>
+          <select id="region-filter" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; width: 100%; cursor: pointer;">
+            <option value="All">Semua Region</option>
+            <option value="Australia">Australia</option>
+            <option value="Canada">Canada</option>
+            <option value="France">France</option>
+            <option value="Germany">Germany</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="United States">United States</option>        
+          </select>
+        </div>
+
+        <div class="threshold-group" style="display: flex; flex-direction: column; gap: 4px; text-align: left;">
+          <label style="font-size: 13px; font-weight: 600; color: #334155; display: flex; justify-content: space-between;">
+            <span>Z-Score Threshold:</span>
+            <span id="zscore-val" style="color: #2563eb; font-weight: 700;">1.5</span>
+          </label>
+          <input type="range" id="zscore-slider" min="0.5" max="3.0" step="0.1" value="1.5" style="width: 100%; cursor: pointer; margin-top: 4px;">
+          <small id="zscore-implication" style="display: block; font-size: 11px; color: #4b5563; line-height: 1.2;">Sensitivitas Normal: Keseimbangan statistik yang direkomendasikan.</small>
+        </div>
+
+        <div class="threshold-group" style="display: flex; flex-direction: column; gap: 6px; text-align: left;">
+          <label for="mom-input" style="font-size: 13px; font-weight: 600; color: #334155;">MoM Threshold (%):</label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <input type="number" id="mom-input" min="5" max="100" step="5" value="25" style="width: 80px; padding: 6px; font-size: 13px; border: 1px solid #cbd5e1; border-radius: 6px; text-align: center;">
+            <span id="mom-val" style="font-size: 12px; color: #10b981; font-weight: 600;">25%</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="summary-cards" id="summary-cards"></div>
+      <p id="setup-text" class="zone-desc"></p>
+    </div>
+  </section>
+
+  <section class="zone zone-conflict">
+    <div class="zone-inner">
+      <div class="zone-kicker conflict">Conflict &nbsp;·&nbsp; Anomali Terdeteksi</div>
+      <p id="conflict-text" class="zone-desc"></p>
+
+      <div class="alert-panel" style="margin-bottom: 24px;">
+        <div class="alert-panel-header">
+          <div class="aph-left">
+            <span class="alert-icon">🚨</span>
+            <span class="alert-title">Anomali Terdeteksi</span>
+            <span class="severity-badge severe"  id="badge-severe">0 Kritis</span>
+            <span class="severity-badge warning" id="badge-warning">0 Peringatan</span>
+          </div>
+          <button id="btn-narrate" onclick="requestAlertNarration()">🤖 Narasi AI</button>
+        </div>
+        <div class="alert-tabs">
+          <button class="alert-tab active" onclick="switchAlertTab('raw', this)">Data Anomali</button>
+          <button class="alert-tab"        onclick="switchAlertTab('ai', this)">Narasi AI</button>
+        </div>
+        <div id="alert-tab-raw" class="alert-tab-content"></div>
+        <div id="alert-tab-ai"  class="alert-tab-content" style="display:none">
+          <div id="ai-narration-output">
+            <p class="placeholder-text">Klik "Narasi AI" untuk mendapat penjelasan dari LLM.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="conflict-charts-grid">
+        
+        <div class="chart-card chart-card-wide">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 id="chart-title-subcat" style="margin: 0;">Profit Margin per Sub-Kategori (Sorotan Anomali)</h3>
+            <div class="chart-legend" style="font-size: 12px;">
+              <span class="legend-dot normal"></span> Normal
+              <span class="legend-dot anomaly" style="margin-left:12px"></span> Anomali
+            </div>
+          </div>
+          <div id="chart-subcat"></div>
+        </div>
+
+        <div class="chart-side-col">
+          <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="margin: 0; font-size: 1rem;">Sales per Kategori</h3>
+              <button class="btn-chart-insight" onclick="triggerChartInsight('category')" style="padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
+                📊 Analisis
+              </button>
+            </div>
+            <div id="chart-category"></div>
+          </div>
+          
+          <div class="chart-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h3 style="margin: 0; font-size: 1rem;">Profit per Region</h3>
+              <button class="btn-chart-insight" onclick="triggerChartInsight('region')" style="padding: 4px 8px; font-size: 0.75rem; cursor: pointer;">
+                🌍 Analisis
+              </button>
+            </div>
+            <div id="chart-region"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section class="zone zone-resolution">
+    <div class="zone-inner">
+      <div class="zone-kicker resolution">Resolution &nbsp;·&nbsp; Insight & Rekomendasi</div>
+      <p id="resolution-text" class="zone-desc"></p>
+      
+      <div class="resolution-grid">
+        
+        <div class="insight-card">
+          <div class="insight-header">
+            <h3>🤖 AI Insight</h3>
+            <span class="model-badge" id="model-badge"></span>
+          </div>
+          <div id="insight-output" class="insight-output">
+            <p class="insight-placeholder">Klik "Minta Insight" atau tombol "Analisis" pada grafik untuk memicu ringkasan data dari AI.</p>
+          </div>
+          <div class="insight-input-wrap">
+            <textarea id="custom-question" placeholder="Tanya sesuatu tentang data ini, atau biarkan kosong untuk insight otomatis..." rows="2"></textarea>
+            <button id="btn-insight" onclick="requestInsight()">Minta Insight →</button>
+          </div>
+          <div class="quick-questions">
+            <p class="qq-label">Pertanyaan cepat:</p>
+            <button class="qbtn" onclick="quickAsk('Kategori mana yang sebaiknya diprioritaskan untuk meningkatkan profit?')">Prioritas profit?</button>
+            <button class="qbtn" onclick="quickAsk('Region mana yang perlu perhatian khusus dan mengapa?')">Masalah region?</button>
+            <button class="qbtn" onclick="quickAsk('Apakah ada anomali atau hal mengejutkan dalam data ini?')">Ada anomali?</button>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-card-title" style="margin-bottom: 16px; font-weight: 600;">Ringkasan Performa per Kategori</div>
+          <div id="category-table"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div><footer class="dash-footer">
+  <span>Dataset: Global Sales &nbsp;·&nbsp; Powered by D3.js + AI</span>
+  <span>Model: <span id="footer-model"></span></span>
+</footer>
+
+<script src="config.js"></script>
+<script src="aiInsight.js"></script>
+<script src="anomalyDetector.js"></script>
+<script src="storyEngine.js"></script> 
+<script src="app.js"></script>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('tab-ai').classList.toggle('active', tab === 'ai');
+  document.getElementById('tab-tableau').classList.toggle('active', tab === 'tableau');
+  // Pastikan tombol yang tidak aktif kehilangan active
+  if (tab === 'ai') document.getElementById('tab-tableau').classList.remove('active');
+  else              document.getElementById('tab-ai').classList.remove('active');
+  document.getElementById('panel-ai').style.display      = tab === 'ai'      ? 'block' : 'none';
+  document.getElementById('panel-tableau').style.display = tab === 'tableau' ? 'block' : 'none';
+  
+  if (tab === 'tableau') {
+    const ifr = document.getElementById('tableau-iframe');
+    if (!ifr.src || ifr.src === window.location.href) {
+      ifr.src = ifr.getAttribute('data-src');
+    }
+  }
+}
+</script>
+</body>
+</html>
