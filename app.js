@@ -67,7 +67,7 @@ function parseDate(str) {
 }
 
 // LOAD DATA 
-d3.csv('Sales_BY_Category_202606040914-1.csv').then(function(data) {
+d3.csv('d3.csv('sales_data.csv')').then(function(data) {
   
   console.log("Sampel data mentah dari Sales_BY_Category:", data[0]);
 
