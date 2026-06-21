@@ -340,17 +340,29 @@ function triggerAILiveStory() {
       fillZone('conflict-text',   scr.conflict);
       fillZone('resolution-text', scr.resolution);
       saveStoryCache({ setup: scr.setup, conflict: scr.conflict, resolution: scr.resolution });
-    } else {
+    }  else {
       console.error('generateStory gagal:', storyR.reason);
-      ['setup-text', 'conflict-text', 'resolution-text'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && !el.classList.contains('ai-loaded')) {
-          el.innerHTML = `<span style="color:#dc2626;">Gagal memuat narasi AI: ${storyR.reason.message}. ` +
-            `Pastikan Ollama berjalan di ${CONFIG.OLLAMA_URL} (jalankan <code>ollama serve</code> dan ` +
-            `<code>ollama pull ${CONFIG.OLLAMA_MODEL}</code>), atau ganti AI_PROVIDER ke 'groq' di config.js.</span>`;
-        }
-      });
+      const error = storyR.reason;
+      let userMessage = error.message || 'Terjadi kesalahan saat menghubungi AI';
+        if (userMessage.includes('Rate limit') || userMessage.includes('rate limit')) {
+          userMessage = 'Rate limit Groq tercapai. Tunggu 15–30 detik lalu coba lagi.'; 
+        } else if (userMessage.includes('decommissioned') || userMessage.includes('no longer supported')) {
+                userMessage = 'Model Groq sudah tidak tersedia. Silakan ganti GROQ_MODEL di config.js'; 
+              } else if (userMessage.includes('401') || userMessage.includes('Invalid API Key')) { userMessage = 'API Key Groq bermasalah. Periksa config.js';}
+
+  const errorHTML = `
+    <span style="color:#dc2626;">
+      Gagal memuat narasi AI: ${userMessage}<br>
+      <small style="color:#64748b;">AI Provider: ${CONFIG.AI_PROVIDER.toUpperCase()} • Model: ${CONFIG.GROQ_MODEL}</small>
+    </span>`;
+
+  ['setup-text', 'conflict-text', 'resolution-text'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.classList.contains('ai-loaded')) {
+      el.innerHTML = errorHTML;
     }
+  });
+}
 
     if (insightR.status === 'fulfilled') {
       const el = document.getElementById('insight-output');
