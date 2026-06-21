@@ -1,15 +1,14 @@
 // storyEngine.js
 // Menyusun narasi SCR dashboard dari summary + anomali
-// Depends on: config.js, aiInsight.js (untuk callOllama/callGroq)
 
-// Generate full story 
+// generate full story 
 async function generateStory(summary, anomalies, zScoreThreshold = 1.5, momThreshold = 25) {
   const prompt = buildStoryPrompt(summary, anomalies, zScoreThreshold, momThreshold);
   if (CONFIG.AI_PROVIDER === 'ollama') return await callOllama(prompt);
   return await callGroq(prompt);
 }
 
-// Generate judul naratif untuk dashboard
+// generate judul naratif untuk dashboard
 async function generateTitle(summary, anomalies, zScoreThreshold = 1.5, momThreshold = 25) {
   const severeCount = anomalies.profitOutliers.filter(a => a.severity === 'severe').length
     + anomalies.momSpikes.filter(a => a.severity === 'severe').length;
@@ -47,7 +46,6 @@ function cleanTitle(raw) {
   const jawabanMatch = text.match(/jawaban\s*:\s*([\s\S]+)$/i);
   if (jawabanMatch) text = jawabanMatch[1].trim();
 
-  // Buang baris yang mengandung kata-kata instruksi/template (echo prompt)
   const badKeywords = /tugas\s*:|format\s*:|contoh\s+(baik|buruk)|maksimal\s+\d+\s+kata|hanya\s+tulis|tanpa\s+tanda\s+kutip|judul\s+harus|berdasarkan\s+data\s+retail/i;
   text = text
     .split('\n')
@@ -67,7 +65,7 @@ function cleanTitle(raw) {
   return text || 'Sales Analytics Dashboard';
 }
 
-// Build prompt untuk full story (SCR format) 
+// build prompt untuk full story (SCR format) 
 function buildStoryPrompt(summary, anomalies, zScoreThreshold = 1.5, momThreshold = 25) {
   const profitLines = anomalies.profitOutliers
     .map(a => `  - ${a.name}: margin ${a.margin}% (Z=${a.zScore}, ${a.severity})`)
@@ -118,7 +116,7 @@ Tulis narasi dalam Bahasa Indonesia dengan FORMAT PERSIS seperti ini:
 Gunakan angka spesifik dari data. Maksimal 6 kalimat total. Langsung ke poin.`;
 }
 
-// Parse respons LLM menjadi objek SCR
+// parse respons LLM menjadi objek SCR
 function parseStoryResponse(text) {
   const result = { setup: '', conflict: '', resolution: '', raw: text };
 
@@ -141,7 +139,7 @@ function parseStoryResponse(text) {
   return result;
 }
 
-// Bersihkan teks naratif SCR dari sisa label/markdown
+// untuk teks naratif SCR bersih dari sisa label/markdown
 function cleanNarrativeText(text) {
   if (!text) return '';
   return text

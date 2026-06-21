@@ -1,7 +1,7 @@
 // aiInsight.js
 // Modul untuk komunikasi dengan LLM (Groq)
 
-// ── Build prompt dari ringkasan data ─────────────────────────
+// build prompt dari ringkasan data
 function buildPrompt(stats, focusQuestion = '') {
   const catLines = (stats.categories || [])
     .map(c => `   - Kategori ${c.category}: Total Sales $${(c.sales/1000).toFixed(1)}K, Total Profit $${(c.profit/1000).toFixed(1)}K`)
@@ -30,10 +30,8 @@ FAKTA UTAMA DASHBOARD:
   return context + '\n---\nPertanyaan: ' + question;
 }
 
-// ── Implementasi Groq ─────────────────────────────────────────
+// Panggil Groq
 async function callGroq(prompt) {
-  // Tidak ada header Authorization di sini — key Groq ditambahkan di sisi
-  // server oleh api/groq.js, bukan dari browser.
   const res = await fetch(CONFIG.GROQ_URL, {
     method:  'POST',
     headers: {
@@ -66,13 +64,13 @@ async function callGroq(prompt) {
   return data.choices[0].message.content;
 }
 
-// ── Panggil Groq untuk insight utama
+// Untuk insight utama
 async function getInsight(stats, focusQuestion = '') {
   const prompt = buildPrompt(stats, focusQuestion);
   return await callGroq(prompt);
 }
 
-// ── Insight spesifik per Chart
+// Insight spesifik per Chart
 async function getInsightForChart(chartType, stats) {
   let specificPrompt = '';
 
@@ -111,13 +109,13 @@ Pertanyaan: Berikan 2 insight bisnis singkat mengenai performa penjualan antar n
   return await callGroq(specificPrompt);
 }
 
-// ── Anomali spesifik
+// Anomali spesifik
 async function narrateAlert(anomaly) {
   const prompt = buildAlertPrompt(anomaly);
   return await callGroq(prompt);
 }
 
-// ── Build prompt untuk satu anomali
+// Build prompt untuk satu anomali
 function buildAlertPrompt(anomaly) {
   let context = '';
 

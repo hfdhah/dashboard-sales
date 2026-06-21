@@ -1,8 +1,7 @@
 // anomalyDetector.js
 // Semua fungsi deteksi anomali statistik untuk AI-Augmented Dashboard
-// Depends on: D3.js (untuk fungsi rollups, sum, mean, max, dan deviation)
 
-// ── Helper: Statistik Dasar ───────────────────────────────────
+
 function mean(arr) {
   return arr.length === 0 ? 0 : arr.reduce((s, v) => s + v, 0) / arr.length;
 }
@@ -28,9 +27,7 @@ function percentile(arr, p) {
   return sorted[lower] + frac * (sorted[lower + 1] - sorted[lower] || 0);
 }
 
-// Outlier Profit Margin per Sub-Kategori (Z-Score Dinamis)
 function detectProfitOutliers(data, threshold = 1.5) {
-  // Agregasi profit dan sales per sub-kategori
   const bySubcat = d3.rollups(
     data,
     v => ({
@@ -62,10 +59,10 @@ function detectProfitOutliers(data, threshold = 1.5) {
       };
     })
     .filter(d => d.isOutlier)
-    .sort((a, b) => +a.zScore - +b.zScore); // Yang paling merugi/negatif duluan
+    .sort((a, b) => +a.zScore - +b.zScore); 
 }
 
-// Deteksi Perubahan MoM (Month-on-Month)
+// deteksi perubahan MoM 
 function detectMoMSpikes(data, threshold = 25) {
   const byMonth = d3.rollups(
     data,
@@ -87,8 +84,6 @@ function detectMoMSpikes(data, threshold = 25) {
     if (prev.sales === 0) continue;
 
     const momPct = ((curr.sales - prev.sales) / Math.abs(prev.sales)) * 100;
-
-    // Batas kelayakan anomali beralih ke input dinamis threshold
     if (Math.abs(momPct) >= threshold) {
       anomalies.push({
         type:      'mom_spike',
@@ -107,7 +102,6 @@ function detectMoMSpikes(data, threshold = 25) {
     .slice(0, 5);
 }
 
-// Metode 3: Outlier Sales per Transaksi Menggunakan IQR
 function detectIQROutliers(data) {
   if (data.length === 0) {
     return { fences: { lower: '0.00', upper: '0.00' }, totalOutliers: 0, pctOutliers: '0.0', bySubcat: [] };
@@ -120,8 +114,6 @@ function detectIQROutliers(data) {
   const lower = Q1 - 1.5 * IQR;
   const upper = Q3 + 1.5 * IQR;
   const outliers = data.filter(d => d.sales < lower || d.sales > upper);
-
-  // Transaksi anomali berdasarkan sub-kategori produk
   const bySubcat = d3.rollups(
     outliers,
     v => ({
@@ -150,7 +142,6 @@ function detectIQROutliers(data) {
 }
 
 function detectRegionOutliers(data, threshold = 1.5) {
-  // 1. Agregasi total sales dan profit per region
   const regionMap = d3.rollups(
     data,
     v => {
@@ -166,17 +157,11 @@ function detectRegionOutliers(data, threshold = 1.5) {
   );
 
   if (regionMap.length === 0) return [];
-
-  // 2. Ekstrak daftar nilai margin untuk kalkulasi statistik
   const margins = regionMap.map(([name, stats]) => stats.margin);
   const meanMargin = d3.mean(margins);
-  
-  // Menggunakan d3.deviation untuk mencari standar deviasi antar region. fallback ke angka 1.
   const stdDevMargin = d3.deviation(margins) || 1;
-
   const outliers = [];
 
-  // 3. Hitung Z-score untuk masing-masing region
   regionMap.forEach(([name, stats]) => {
     const z = (stats.margin - meanMargin) / stdDevMargin;
     if (z < -threshold) {
@@ -193,7 +178,6 @@ function detectRegionOutliers(data, threshold = 1.5) {
   return outliers;
 }
 
-// Helper: Hitung Jumlah Tingkat Keparahan (Untuk Badge UI)
 function countSeverity(anomalies) {
   const allAnomalies = [
     ...anomalies.profitOutliers,
@@ -208,7 +192,6 @@ function countSeverity(anomalies) {
   };
 }
 
-// Fungsi Utama: Menerima Operan Nilai Slider dari app.js
 function detectAllAnomalies(data, zScoreDashboard = 1.5, momDashboard = 25) {
   const outputs = {
     profitOutliers: detectProfitOutliers(data, zScoreDashboard),
@@ -217,7 +200,6 @@ function detectAllAnomalies(data, zScoreDashboard = 1.5, momDashboard = 25) {
     regionOutliers: detectRegionOutliers(data, zScoreDashboard) 
   };
 
-  // Hitung jumlah anomali severe, warning, & info untuk disematkan ke badge header UI
   outputs.severityCount = countSeverity(outputs);
 
   return outputs;

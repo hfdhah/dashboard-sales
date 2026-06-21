@@ -1,11 +1,11 @@
 ﻿const COLOR = {
-  normal:   '#94a3b8',   // abu-abu: data normal/background
-  good:     '#16a34a',   // hijau: profit positif, target tercapai
-  warn:     '#d97706',   // kuning: perhatian, hampir batas
-  severe:   '#dc2626',   // merah: anomali kritis, rugi
-  warning:  '#ea580c',   // oranye: anomali sedang
-  accent:   '#2563eb',   // biru: highlight utama, tren
-  highlight:'#7c3aed',   // ungu: secondary highlight
+  normal:   '#94a3b8',   
+  good:     '#16a34a',   
+  warn:     '#d97706',  
+  severe:   '#dc2626',   
+  warning:  '#ea580c',   
+  accent:   '#2563eb',   
+  highlight:'#7c3aed',   
 };
 
 function anomalyColor(severity) {
@@ -22,14 +22,14 @@ function updateChartTitles(anomalies) {
   const worstProfit = anomalies.profitOutliers[0];
   const worstMoM    = anomalies.momSpikes[0];
 
-  // Chart subcat
+  // chart subcat
   if (worstProfit) {
     const sign = +worstProfit.margin < 0 ? 'RUGI' : 'Outlier';
     document.getElementById('chart-title-subcat').textContent =
       `Profit Margin per Sub-Kategori — ${worstProfit.name} ${sign} (${worstProfit.margin}%)`;
   }
 
-  // Chart tren
+  // chart tren
   if (worstMoM) {
     const dir = worstMoM.direction === 'drop' ? 'Turun' : 'Naik';
     document.getElementById('chart-title-trend').textContent =
@@ -37,23 +37,22 @@ function updateChartTitles(anomalies) {
   }
 }
 
-// BAGIAN 1: VARIABEL GLOBAL & CLEANING ENGINE
+// cleaning data
 let rawData = [];          
 let summaryStats = {};    
 let currentAnomalies = {}; 
 
-// Kendali Threshold Aktif (Default)
+// threshold aktif 
 let zScoreThreshold = 1.5;
 let momThreshold = 25;
 
-// Helper: parse angka
+
 function parseNum(val) {
   if (val === undefined || val === null || val === '') return 0;
   const num = parseFloat(String(val).trim().replace(',', '.'));
   return isNaN(num) ? 0 : num;
 }
 
-// Helper: parse tanggal dengan format DD/MM/YYYY atau YYYY-MM-DD
 function parseDate(str) {
   if (!str) return null;
   const parts = str.trim().split('/');
@@ -61,12 +60,11 @@ function parseDate(str) {
     const d = new Date(+parts[2], +parts[1] - 1, +parts[0]);
     return isNaN(d.getTime()) ? null : d;
   }
-  // Fallback untuk format strip ISO YYYY-MM-DD
   const dIso = new Date(str);
   return isNaN(dIso.getTime()) ? null : dIso;
 }
 
-// LOAD DATA 
+// load data 
 d3.csv('sales_data.csv').then(function(data) {
   
   console.log("Sampel data mentah dari Sales_BY_Category:", data[0]);
@@ -98,17 +96,15 @@ d3.csv('sales_data.csv').then(function(data) {
 
   console.log(`Berhasil memuat ${rawData.length} baris data.`);
 
-  // Inisialisasi kontrol threshold slider & dropdown di UI
+  // inisialisasi kontrol threshold slider & dropdown
   initThresholdControls();
 
-  // Jalankan inisialisasi awal dashboard pertama kali
   if (rawData.length > 0) {
     updateDashboard('All');
   } else {
     console.error("Data kosong setelah proses mapping!");
   }
 
-  // Event listener filter region dropdown
   d3.select('#region-filter').on('change', function(event) {
     const selectedRegion = event.target.value;
     
@@ -116,7 +112,7 @@ d3.csv('sales_data.csv').then(function(data) {
     if (outputDiv) {
       outputDiv.innerHTML = `
         <p class="insight-placeholder" style="color: #ea580c; font-weight: 500;">
-          ⚠️ Data wilayah berubah, memperbarui analisis cerita bisnis...
+          Data wilayah berubah, memperbarui analisis cerita bisnis...
         </p>`;
     }
     updateDashboard(selectedRegion);
@@ -125,7 +121,6 @@ d3.csv('sales_data.csv').then(function(data) {
   console.error("Gagal membaca file CSV:", error);
 });
 
-// Fungsi Inisialisasi Kontrol Threshold Slider & Label Implikasi
 function initThresholdControls() {
   const zSlider = d3.select('#zscore-slider');
   if (!zSlider.empty()) {
@@ -159,7 +154,6 @@ function initThresholdControls() {
   }
 }
 
-// BAGIAN 2: STATISTIK ENGINE
 function computeSummary(data) {
   const totalSales  = d3.sum(data, d => d.sales);
   const totalProfit = d3.sum(data, d => d.profit);
@@ -196,7 +190,7 @@ function computeSummary(data) {
   };
 }
 
-// RINGKASAN PERFORMA PER KATEGORI 
+// ringkasan performa pe kategori
 function renderCategoryPerformanceSummary(stats) {
   const container = document.getElementById('category-table');
   if (!container || !stats.categories || stats.categories.length === 0) return;
@@ -227,7 +221,6 @@ function renderCategoryPerformanceSummary(stats) {
     </table>`;
 }
 
-// Pembaruan Data Dashboard 
 function updateDashboard(selectedRegion) {
   let filteredData = rawData;
   
@@ -235,18 +228,15 @@ function updateDashboard(selectedRegion) {
     filteredData = rawData.filter(d => d.region.toLowerCase() === selectedRegion.toLowerCase());
   }
 
-  // 1. Re-kalkulasi Angka Utama Kartu
   summaryStats = computeSummary(filteredData);
   displaySummaryCards(summaryStats);
 
-  // 2. Kirim parameter threshold aktif ke detektor anomali
   if (typeof detectAllAnomalies === "function") {
     currentAnomalies = detectAllAnomalies(filteredData, zScoreThreshold, momThreshold);
   } else {
     currentAnomalies = {};
   }
   
-  // Hitung akumulasi badge status tingkat keparahan
   let severeCount = 0;
   let warningCount = 0;
 
@@ -272,23 +262,14 @@ function updateDashboard(selectedRegion) {
 
   renderRawAnomalies(currentAnomalies);
 
-  // 3. Re-draw Grafik D3.js dengan Canvas bersih
   const anomalyMap = buildAnomalyMap(currentAnomalies);
   renderCategoryChart(filteredData);
   renderRegionChart(filteredData);
   renderSubcatChart(filteredData, anomalyMap);
-
-  // 3b. Render Ringkasan Performa per Kategori
   renderCategoryPerformanceSummary(summaryStats);
-
-  // 4. Salurkan Event Sinyal Siap ke Sistem Eksternal / storyEngine
   dispatchDataReady(summaryStats);
-
-  // 5. Otomatisasi Pembaharuan Jalur Narasi AI (SCR Engine Asinkron)
   triggerAILiveStory();
 }
-
-// Key untuk menyimpan hasil narasi AI terakhir di localStorage
 const AI_STORY_CACHE_KEY = 'aiStoryCache';
 
 function loadCachedStory() {
@@ -306,14 +287,13 @@ function loadCachedStory() {
     if (cached.insight) {
       const el = document.getElementById('insight-output');
       if (el) el.innerHTML = formatInsight(cached.insight) +
-        '<p style="color:#94a3b8;font-size:12px;margin-top:8px;">⏳ Menampilkan hasil sebelumnya, sedang memperbarui...</p>';
+        '<p style="color:#94a3b8;font-size:12px;margin-top:8px;">Menampilkan hasil sebelumnya, sedang memperbarui...</p>';
     }
   } catch (e) {
     console.warn('Gagal membaca cache narasi AI:', e);
   }
 }
 
-// Simpan hasil narasi AI yang baru berhasil dibuat ke localStorage
 function saveStoryCache(data) {
   try {
     const existing = JSON.parse(localStorage.getItem(AI_STORY_CACHE_KEY) || '{}');
@@ -323,21 +303,20 @@ function saveStoryCache(data) {
   }
 }
 
-// Fungsi Pemicu Otomatis Narasi AI Berdasarkan Threshold Baru
 function triggerAILiveStory() {
   const titleEl = document.getElementById('narrative-title');
   if (titleEl && !titleEl.classList.contains('loaded')) {
     titleEl.textContent = "Sales Analytics Dashboard";
   }
 
-  // 1. Tampilkan hasil sebelumnya 
+  // menampilkan hasil sebelumnya
   loadCachedStory();
 
-  // 2. Tampilkan indikator loading di zona narasi
+  // menampilkan ai loading
   ['setup-text', 'conflict-text', 'resolution-text'].forEach(id => {
     const el = document.getElementById(id);
     if (el && !el.classList.contains('ai-loaded')) {
-      el.innerHTML = '<span class="loading-p">⏳ Sedang membuat narasi AI... (mohon tunggu, ini memanggil LLM)</span>';
+      el.innerHTML = '<span class="loading-p">Sedang membuat narasi AI... (mohon tunggu, ini memanggil LLM)</span>';
     }
   });
 
@@ -363,11 +342,10 @@ function triggerAILiveStory() {
       saveStoryCache({ setup: scr.setup, conflict: scr.conflict, resolution: scr.resolution });
     } else {
       console.error('generateStory gagal:', storyR.reason);
-      // Hanya tampilkan error jika belum ada cache yang ditampilkan
       ['setup-text', 'conflict-text', 'resolution-text'].forEach(id => {
         const el = document.getElementById(id);
         if (el && !el.classList.contains('ai-loaded')) {
-          el.innerHTML = `<span style="color:#dc2626;">⚠️ Gagal memuat narasi AI: ${storyR.reason.message}. ` +
+          el.innerHTML = `<span style="color:#dc2626;">Gagal memuat narasi AI: ${storyR.reason.message}. ` +
             `Pastikan Ollama berjalan di ${CONFIG.OLLAMA_URL} (jalankan <code>ollama serve</code> dan ` +
             `<code>ollama pull ${CONFIG.OLLAMA_MODEL}</code>), atau ganti AI_PROVIDER ke 'groq' di config.js.</span>`;
         }
@@ -382,7 +360,7 @@ function triggerAILiveStory() {
       console.error('getInsight gagal:', insightR.reason);
       const el = document.getElementById('insight-output');
       if (el && !el.querySelector('.insight-text')) {
-        el.innerHTML = `<p class="insight-placeholder" style="color:#dc2626;">⚠️ Gagal memuat insight AI: ${insightR.reason.message}</p>`;
+        el.innerHTML = `<p class="insight-placeholder" style="color:#dc2626;">Gagal memuat insight AI: ${insightR.reason.message}</p>`;
       }
     }
   });
@@ -399,7 +377,6 @@ function dispatchDataReady(stats) {
   window.dispatchEvent(new CustomEvent('capstone-data-ready', { detail: stats }));
 }
 
-// BAGIAN 3: CORE RENDERING CHARTS 
 function renderCategoryChart(data) {
   d3.select('#chart-category').selectAll('*').remove();
   const margin = { top: 20, right: 60, bottom: 40, left: 90 };
@@ -507,7 +484,6 @@ function renderSubcatChart(data, anomalyMap = new Map()) {
   svg.select('.domain').remove();
 }
 
-// BAGIAN 4: UI MANIPULATION & ALERTS STREAM ENGINE
 function displaySummaryCards(stats) {
   const salesNum = parseNum(stats.totalSales);
   const profitNum = parseNum(stats.totalProfit);
@@ -578,7 +554,6 @@ function buildAnomalyMap(anomalies) {
   return map;
 }
 
-// BAGIAN 5: GATEWAY KONEKTIVITAS LLM GENERATIVE AI 
 async function requestInsight() {
   const btn = document.getElementById('btn-insight');
   const output = document.getElementById('insight-output');
@@ -595,7 +570,7 @@ async function requestInsight() {
   } catch (err) {
     output.innerHTML = `<div class="insight-error"><strong>Koneksi AI Terputus:</strong><br>${err.message}</div>`;
   } finally {
-    btn.disabled = false; btn.textContent = 'Minta Insight →';
+    btn.disabled = false; btn.textContent = 'Minta Insight';
   }
 }
 
@@ -621,7 +596,7 @@ async function requestAlertNarration() {
   } catch (err) {
     output.innerHTML = `<p style="color:#dc2626; font-weight:600;">Error: ${err.message}</p>`;
   } finally {
-    btn.disabled = false; btn.textContent = '🤖 Narasi AI';
+    btn.disabled = false; btn.textContent = 'Narasi AI';
   }
 }
 
@@ -657,7 +632,7 @@ async function triggerChartInsight(chartType) {
         <div class="insight-text" style="font-family: sans-serif;">
           ${dataSummaryHtml}
           <div style="font-size: 0.95rem; color: #1e293b;">
-            <div style="font-weight: 700; margin-bottom: 12px; color: #0f172a;">🧠 Rekomendasi AI Insight:</div>
+            <div style="font-weight: 700; margin-bottom: 12px; color: #0f172a;">Rekomendasi AI Insight:</div>
             <div style="line-height: 1.6; color: #334155;">${formatInsight(insightResult)}</div>
           </div>
         </div>`;

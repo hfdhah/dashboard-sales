@@ -1,12 +1,6 @@
-/* ============================================================
-   style.css  —  Dashboard Design System
-   Organized: Reset → Tokens → Layout → Components → Utilities
-   ============================================================ */
+/* style.css */
 
-
-/* ─────────────────────────────────────────────────────────────
-   1. DESIGN TOKENS  (ubah di sini, efek ke seluruh halaman)
-   ───────────────────────────────────────────────────────────── */
+/* 1. design seluruh halaman */
 :root {
   /* Warna Utama */
   --color-blue:        #2563eb;
@@ -34,36 +28,36 @@
   --color-teal:        #0f6e56;
   --color-teal-light:  #d1fae5;
 
-  /* Teks */
+  /* teks */
   --text-primary:   #1a1d23;
   --text-secondary: #374151;
   --text-muted:     #6b7280;
   --text-faint:     #9ca3af;
   --text-label:     #94a3b8;
 
-  /* Background */
+  /* background */
   --bg-base:   #f8f9fb;
   --bg-white:  #ffffff;
   --bg-subtle: #f1f5f9;
 
-  /* Border */
+  /* border */
   --border-color: #e2e5ea;
   --border-light: #f1f5f9;
   --border-faint: #f3f4f6;
 
-  /* Elevasi (shadow) */
+  /* shadow */
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08);
 
-  /* Border radius */
+  /* border radius */
   --radius-sm:   6px;
   --radius-md:   8px;
   --radius-lg:   12px;
   --radius-xl:   16px;
   --radius-full: 9999px;
 
-  /* Spacing dasar */
+  /* spacing dasar */
   --space-1:  4px;
   --space-2:  8px;
   --space-3:  12px;
@@ -72,16 +66,13 @@
   --space-6:  24px;
   --space-8:  32px;
 
-  /* Tipografi */
+  /* tipografi */
   --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
   --font-size-base: 14px;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   2. GLOBAL RESET & BASE
-   ───────────────────────────────────────────────────────────── */
+/* 2. global riset & base */
 *,
 *::before,
 *::after {
@@ -107,10 +98,7 @@ body:not(.loading) {
   transition: opacity 0.4s ease;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   3. DASHBOARD SHELL
-   ───────────────────────────────────────────────────────────── */
+/* 3. dasboard shell */
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
@@ -120,10 +108,7 @@ body:not(.loading) {
   overflow: hidden;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   4. HEADER
-   ───────────────────────────────────────────────────────────── */
+/* 4. header */
 .dash-header {
   background: var(--bg-subtle);
   padding: var(--space-3) var(--space-5);
@@ -180,10 +165,7 @@ body:not(.loading) {
   color: var(--text-faint);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   5. FILTER BAR
-   ───────────────────────────────────────────────────────────── */
+/* 5. filter bar */
 .filter-bar {
   padding: var(--space-4) var(--space-6);
   background: var(--bg-base);
@@ -218,10 +200,7 @@ body:not(.loading) {
   box-shadow: 0 0 0 3px var(--color-blue-focus);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   6. ZONE LAYOUT  (narrative sections)
-   ───────────────────────────────────────────────────────────── */
+/* 6. ZONE LAYOUT  (narrative sections) */
 .zone {
   padding: var(--space-8) 0;
   border-bottom: 1px solid var(--border-color);
@@ -260,7 +239,7 @@ body:not(.loading) {
   margin-top: 6px;
 }
 
-/* Narrative title */
+/* narrative title */
 #narrative-title {
   font-size: clamp(20px, 2.5vw, 32px);
   font-weight: 700;
@@ -285,12 +264,7 @@ body:not(.loading) {
 
 .setup-text.ai-loaded { opacity: 1; }
 
-
-/* ─────────────────────────────────────────────────────────────
-   7. KPI / SUMMARY CARDS
-   ───────────────────────────────────────────────────────────── */
-
-/* Versi grid lama (summary-cards) */
+/* 7. kpi */
 .summary-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -374,12 +348,7 @@ body:not(.loading) {
   color: var(--text-faint);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   8. LAYOUT GRIDS
-   ───────────────────────────────────────────────────────────── */
-
-/* Main dashboard grid (chart + sidebar) */
+/* 8. layout grids */
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 380px;
@@ -387,24 +356,21 @@ body:not(.loading) {
   padding: var(--space-6) var(--space-6) 0;
 }
 
-/* Conflict section */
+/* conflict section */
 .conflict-grid {
   display: grid;
   grid-template-columns: 1fr 320px;
   gap: var(--space-4);
 }
 
-/* Resolution section */
+/* resolution section */
 .resolution-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   9. CHART CARDS
-   ───────────────────────────────────────────────────────────── */
+/* 9. chart card */
 .chart-card {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
@@ -443,29 +409,58 @@ body:not(.loading) {
 .legend-dot.normal  { background: var(--text-label); }
 .legend-dot.anomaly { background: var(--color-red); }
 
-/* Tombol insight di dalam chart */
+/* button insight */
 .btn-chart-insight {
-  background: var(--bg-base);
-  border: 1px solid #cbd5e1;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: 12px;
-  font-weight: 500;
-  padding: 5px 12px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 45%, #ec4899 100%);
+  background-size: 200% 200%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(139, 92, 246, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  animation: ai-gradient-shift 4s ease infinite;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn-chart-insight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: ai-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .btn-chart-insight:hover {
-  background: var(--color-blue-light);
-  border-color: var(--color-blue);
-  color: var(--color-blue-dark);
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.08);
+  box-shadow:
+    0 4px 14px rgba(139, 92, 246, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset;
 }
 
+.btn-chart-insight:active {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.95);
+}
 
-/* ─────────────────────────────────────────────────────────────
-   10. AI INSIGHT SIDEBAR
-   ───────────────────────────────────────────────────────────── */
+/* 10. si insight sidebar */
 .insight-card {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
@@ -501,7 +496,7 @@ body:not(.loading) {
   font-family: var(--font-mono);
 }
 
-/* Insight Panel (versi section) */
+/* insight panel section */
 .insight-panel {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
@@ -516,7 +511,7 @@ body:not(.loading) {
   color: var(--text-secondary);
 }
 
-/* Output box */
+/* output box */
 .insight-output {
   min-height: 160px;
   background: var(--bg-base);
@@ -556,7 +551,7 @@ body:not(.loading) {
   font-weight: bold;
 }
 
-/* Input area */
+/* input area */
 .insight-input-wrap {
   display: flex;
   gap: 10px;
@@ -610,7 +605,7 @@ body:not(.loading) {
   transform: translateY(-1px);
 }
 
-/* Quick questions */
+/* quick questions */
 .quick-questions { margin-top: var(--space-5); }
 
 .qq-label {
@@ -641,10 +636,7 @@ body:not(.loading) {
   color: var(--color-blue-dark);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   11. ALERT / ANOMALY PANEL
-   ───────────────────────────────────────────────────────────── */
+/* 11. alert anomali */
 .alert-panel {
   background: var(--bg-white);
   border: 1.5px solid var(--color-red-border);
@@ -710,7 +702,7 @@ body:not(.loading) {
 #btn-narrate:hover    { background: var(--color-red); }
 #btn-narrate:disabled { background: var(--text-faint); cursor: not-allowed; }
 
-/* Tabs */
+/* tabs */
 .alert-tabs {
   display: flex;
   gap: 0;
@@ -742,7 +734,6 @@ body:not(.loading) {
   overflow-y: auto;
 }
 
-/* Alert list — versi lama */
 .alert-item {
   display: flex;
   gap: var(--space-3);
@@ -753,7 +744,6 @@ body:not(.loading) {
 
 .alert-item:last-child { border-bottom: none; }
 
-/* Alert list — versi baru */
 .alert-list {
   padding: 10px 14px;
   display: flex;
@@ -770,8 +760,6 @@ body:not(.loading) {
 }
 
 .alert-item-row:last-child { border-bottom: none; }
-
-/* Dots */
 .ai-dot,
 .arow-dot {
   width: 8px;
@@ -788,7 +776,7 @@ body:not(.loading) {
 .ai-dot.info,
 .alert-item-row.info    .arow-dot { background: var(--color-blue); }
 
-/* Text */
+/* text */
 .ai-label  { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .ai-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
 
@@ -801,7 +789,7 @@ body:not(.loading) {
 
 .no-alert { font-size: 12px; color: var(--text-faint); padding: var(--space-2) 0; }
 
-/* Narration output */
+/* narration output */
 .narration-line {
   padding: var(--space-2) 0;
   font-size: 13px;
@@ -812,10 +800,7 @@ body:not(.loading) {
 
 .narration-line:last-child { border-bottom: none; }
 
-
-/* ─────────────────────────────────────────────────────────────
-   12. PERFORMANCE TABLE
-   ───────────────────────────────────────────────────────────── */
+/* 12. performane table */
 .perf-table-card,
 .performance-summary,
 [class*="perf-summary"],
@@ -852,7 +837,6 @@ body:not(.loading) {
 }
 
 .perf-table thead th:first-child { text-align: left; }
-
 .perf-table tbody tr  { border-bottom: 1px solid var(--border-light); }
 .perf-table tbody tr:last-child { border-bottom: none; }
 
@@ -879,10 +863,7 @@ body:not(.loading) {
 .perf-table td[data-trend="up"]   { color: var(--color-green); font-weight: 700; }
 .perf-table td[data-trend="down"] { color: var(--color-red);   font-weight: 700; }
 
-
-/* ─────────────────────────────────────────────────────────────
-   13. LOADING & SPINNER
-   ───────────────────────────────────────────────────────────── */
+/* 13. load */
 .insight-loading {
   display: flex;
   align-items: center;
@@ -916,10 +897,7 @@ body:not(.loading) {
   to { transform: rotate(360deg); }
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   14. PILL BUTTONS  (Sales System nav)
-   ───────────────────────────────────────────────────────────── */
+/* 14. pill button */
 .btn-pill {
   display: inline-flex;
   align-items: center;
@@ -940,13 +918,114 @@ body:not(.loading) {
 .btn-pill:active { transform: scale(0.97); filter: brightness(0.85); }
 
 .btn-pill.btn-ai {
-  background: var(--color-blue);
-  color: var(--color-blue-border);
+  position: relative;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 45%, #ec4899 100%);
+  background-size: 200% 200%;
+  color: #ffffff;
+  box-shadow:
+    0 2px 10px rgba(139, 92, 246, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  animation: ai-gradient-shift 4s ease infinite;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.btn-pill.btn-ai::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: ai-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-pill.btn-ai .btn-icon,
+.btn-pill.btn-ai > * {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-pill.btn-ai .btn-icon {
+  color: #fde68a;
+  text-shadow: 0 0 8px rgba(253, 230, 138, 0.8);
+}
+
+.btn-pill.btn-ai:hover {
+  box-shadow:
+    0 4px 18px rgba(139, 92, 246, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.08);
+}
+
+.btn-pill.btn-ai:active {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.95);
+}
+
+@keyframes ai-gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+@keyframes ai-shine {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .btn-pill.btn-tableau {
-  background: var(--color-teal);
-  color: var(--color-teal-light);
+  position: relative;
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 45%, #5eead4 100%);
+  background-size: 200% 200%;
+  color: #ffffff;
+  box-shadow:
+    0 2px 10px rgba(13, 148, 136, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  animation: ai-gradient-shift 4s ease infinite;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.btn-pill.btn-tableau::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: ai-shine 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.btn-pill.btn-tableau .btn-icon,
+.btn-pill.btn-tableau > * {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-pill.btn-tableau:hover {
+  box-shadow:
+    0 4px 18px rgba(13, 148, 136, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.08);
+}
+
+.btn-pill.btn-tableau:active {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.95);
 }
 
 .btn-pill .btn-icon {
@@ -955,7 +1034,6 @@ body:not(.loading) {
   flex-shrink: 0;
 }
 
-/* State aktif/non-aktif saat dipakai sebagai tab */
 .btn-pill:not(.active) {
   opacity: 0.55;
   filter: saturate(0.6);
@@ -966,19 +1044,13 @@ body:not(.loading) {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   15. UTILITIES / MISC
-   ───────────────────────────────────────────────────────────── */
+/* 15. misc */
 .placeholder,
 .placeholder-text { color: var(--text-faint); font-size: 13px; font-style: italic; }
 .loading-p, .loading-text { color: var(--text-muted); font-size: 13px; }
 .err-p             { color: var(--color-red); font-size: 12px; }
 
-
-/* ─────────────────────────────────────────────────────────────
-   16. RESPONSIVE
-   ───────────────────────────────────────────────────────────── */
+/* 16. responsive */
 @media (max-width: 1024px) {
   .main-grid {
     grid-template-columns: 1fr;
