@@ -32,11 +32,12 @@ FAKTA UTAMA DASHBOARD:
 
 // ── Implementasi Groq ─────────────────────────────────────────
 async function callGroq(prompt) {
+  // Tidak ada header Authorization di sini — key Groq ditambahkan di sisi
+  // server oleh api/groq.js, bukan dari browser.
   const res = await fetch(CONFIG.GROQ_URL, {
     method:  'POST',
     headers: {
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${CONFIG.GROQ_API_KEY}`
+      'Content-Type':  'application/json'
     },
     body: JSON.stringify({
       model: CONFIG.GROQ_MODEL,
