@@ -1,8 +1,6 @@
 // api/groq.js
-// Serverless proxy (Vercel) — meneruskan request ke Groq tanpa pernah
+// meneruskan request ke Groq tanpa pernah
 // mengirim API key ke browser. Key disimpan sebagai Environment Variable
-// di dashboard Vercel (Project Settings → Environment Variables → GROQ_API_KEY),
-// BUKAN ditulis di kode ini.
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -21,8 +19,6 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      // req.body berisi { model, messages, ... } yang dikirim dari frontend.
-      // Frontend TIDAK PERNAH menyertakan apiKey di sini.
       body: JSON.stringify(req.body)
     });
 
